@@ -76,6 +76,12 @@ public:
     int sendBody() {
         return filerPtr_->send(fd());
     }
+
+    void shutdownWrite() {
+        if (state_.getState() != StateImpl::kStart) return;
+        socketopt::shutdownWrite(fd());
+        set_state(StateImpl::kClose);
+    }
 };
 
 using ConnPtr = std::shared_ptr<HttpConn>;

@@ -101,13 +101,16 @@ size_t HylChan::processWrite(ConnPtr conn) {
         if (n2 > 0) {
             reactor_->modifyListen(conn->fd(), EPOLLOUT | ERR | EPOLLONESHOT);
         }
+        else if (n2 < 0) {
+            return 0;
+        }
         else {
             if (!conn->isCloseConnect()) {
                 reactor_->modifyListen(conn->fd(), EPOLLIN | ERR | EPOLLONESHOT);
             }
             else {
-//                conn->shutdownWrite();
-//                conn_manager_.erase(conn->fd());
+                conn->shutdownWrite();
+                conn_manager_.erase(conn->fd());
             }
         }
     }

@@ -17,8 +17,6 @@
 
 class Mmaper : NonCopyable {
 public:
-    static constexpr int BIG_FILE_SIZE = 1024;
-
     enum StateImpl {
         kNone,
         kClose,

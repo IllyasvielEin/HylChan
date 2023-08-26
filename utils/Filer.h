@@ -18,8 +18,6 @@ public:
         kClose
     };
 
-    static constexpr int BIG_FILE_SIZE = 1024 * 1024 * 1024;
-
     Filer() :
             state_(kNone),
             mmaper_(nullptr),
@@ -31,7 +29,7 @@ public:
 
     }
 
-    Filer(const MmaperPtr& mmaperPtr) :
+    explicit Filer(const MmaperPtr& mmaperPtr) :
             state_(kNone),
             mmaper_(mmaperPtr),
             offset_(0),
@@ -42,7 +40,7 @@ public:
         init();
     }
 
-    Filer(MmaperPtr&& mmaperPtr) :
+    explicit Filer(MmaperPtr&& mmaperPtr) :
             state_(kNone),
             mmaper_(std::move(mmaperPtr)),
             offset_(0),
@@ -60,6 +58,12 @@ public:
 
     void exchange(const MmaperPtr& mmaperPtr) {
         mmaper_ = mmaperPtr;
+        sendCallBack = nullptr;
+        init();
+    }
+
+    void exchange(MmaperPtr&& mmaperPtr) {
+        mmaper_ = std::move(mmaperPtr);
         sendCallBack = nullptr;
         init();
     }

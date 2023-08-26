@@ -4,6 +4,8 @@
 
 #include "Filer.h"
 
+extern const int BIG_FILE_SIZE = 1024 * 1024 * 1024;
+
 void Filer::init()  {
     if (!mmaper_) return;
     size_ = mmaper_->getFileSize();
@@ -20,10 +22,15 @@ void Filer::init()  {
 void Filer::sendSmallFile(int client_fd) {
     ssize_t n;
 
+    int error;
+    auto mmapAddr = (char*)mmaper_->getMap();
+    if (mmapAddr == nullptr) {
+        return;
+    }
     do {
-        n = socketopt::send(client_fd, (char*)mmaper_->getMap() + offset_, left_, 0);
+        n = socketopt::send(client_fd, mmapAddr + offset_, left_, &error);
         if (n == -1) {
-            if (errno == EINTR) {
+            if (error == EINTR) {
                 continue;
             }
             break;

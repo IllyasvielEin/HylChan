@@ -22,7 +22,6 @@ public:
     explicit Reactor(int fd) :
             state_(kNone),
         fd_(fd),
-        dispatch_(std::make_unique<Dispatch>()),
         epollNeko_(std::make_unique<EpollNeko>())
     {
         if (fd_ > 0) {
@@ -51,7 +50,6 @@ public:
 private:
     State<ReactorState> state_;
     int fd_;
-    DispatchPtr  dispatch_;
     EpollNekoPtr epollNeko_;
 };
 

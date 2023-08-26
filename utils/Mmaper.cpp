@@ -10,6 +10,7 @@
 #include <sys/mman.h>
 #include <mutex>
 
+extern const int BIG_FILE_SIZE;
 
 void Mmaper::init() const {
     if (url_.empty()) {
@@ -45,21 +46,18 @@ void Mmaper::init() const {
     }
 
     st_size_ = st.st_size;
-    if (st_size_ < BIG_FILE_SIZE ) {
-        fileMap_ = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fileFd_, 0);
-        if (fileMap_ == MAP_FAILED) {
-            close(fileFd_);
-            state_.setState(kUnavailable);
-            fileMap_ = nullptr;
-            fileFd_ = -1;
-            return;
-        }
-    }
     state_.setState(kStart);
 }
 
 void *Mmaper::getMap() const {
-
+    if (fileMap_ == nullptr) {
+        if (st_size_ < BIG_FILE_SIZE ) {
+            fileMap_ = mmap(NULL, st_size_, PROT_READ, MAP_PRIVATE, fileFd_, 0);
+            if (fileMap_ == MAP_FAILED) {
+                fileMap_ = nullptr;
+            }
+        }
+    }
     return fileMap_;
 }
 
